@@ -1,0 +1,14 @@
+{
+  "name": "ambiente-efimero-demo",
+  "description": "Aplicación Node.js de ejemplo para demostrar ambientes efímeros: cada pull request puede generar un ambiente temporal con su propia URL.",
+  "repository": "https://github.com/JonathanDa16/ambiente-efimero-demo",
+  "logo": "https://nodejs.org/static/logos/nodejsHex.png",
+  "keywords": ["node", "heroku", "review-apps", "ambientes-efimeros"],
+  "image": "heroku/nodejs",
+  "env": {
+    "MENSAJE": {
+      "description": "Texto opcional que se muestra en la bitácora del dyno.",
+      "required": false
+    }
+  }
+}

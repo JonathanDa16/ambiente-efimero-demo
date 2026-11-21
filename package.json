@@ -1,0 +1,14 @@
+{
+  "name": "ambiente-efimero-demo",
+  "version": "1.0.0",
+  "description": "Aplicación Node.js de demostración para ambientes efímeros desplegada en Heroku",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": "20.x"
+  },
+  "author": "Jonathan Daniel Gomez Peña",
+  "license": "MIT"
+}
