@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: ambiente-efimero-demo
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_VERSION
+        value: 20.11.1
+      - key: MENSAJE
+        value: Ambiente efimero de demostracion
