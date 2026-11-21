@@ -1,36 +1,51 @@
 // Servidor mínimo en Node.js: no usa dependencias externas para que el
-// despliegue en Heroku no dependa de un npm install con paquetes de terceros.
+// despliegue no dependa de un npm install con paquetes de terceros.
 const http = require('http');
-const fs = require('fs');
-const path = require('path');
 
 const PUERTO = process.env.PORT || 3000;
 const INICIO = Date.now();
 
-// Heroku inyecta estas variables en cada dyno. Se leen para que la página
-// muestre de qué release y de qué app salió la respuesta.
-const datos = () => ({
-  aplicacion: process.env.HEROKU_APP_NAME || 'local',
-  release: process.env.HEROKU_RELEASE_VERSION || 'local',
-  dyno: process.env.DYNO || 'local',
-  commit: process.env.HEROKU_SLUG_COMMIT
-    ? process.env.HEROKU_SLUG_COMMIT.slice(0, 7)
-    : 'sin commit',
-  version: process.env.HEROKU_RELEASE_CREATED_AT || new Date().toISOString(),
-  encendido_segundos: Math.round((Date.now() - INICIO) / 1000),
-});
+// Cada plataforma inyecta sus propias variables en el contenedor. Se leen las
+// de Render y las de Heroku para que la página muestre de dónde salió la
+// respuesta, con qué commit y en qué instancia.
+const datos = () => {
+  const commit = process.env.RENDER_GIT_COMMIT || process.env.HEROKU_SLUG_COMMIT;
+  return {
+    plataforma: process.env.RENDER ? 'Render' : process.env.DYNO ? 'Heroku' : 'local',
+    servicio: process.env.RENDER_SERVICE_NAME || process.env.HEROKU_APP_NAME || 'local',
+    ambiente: process.env.RENDER_GIT_BRANCH || 'produccion',
+    es_review_app: process.env.IS_PULL_REQUEST === 'true' ? 'si' : 'no',
+    commit: commit ? commit.slice(0, 7) : 'sin commit',
+    instancia: process.env.RENDER_INSTANCE_ID || process.env.DYNO || 'local',
+    region: process.env.RENDER_REGION || 'local',
+    encendido_segundos: Math.round((Date.now() - INICIO) / 1000),
+    generado: new Date().toISOString(),
+  };
+};
+
+const nombres = {
+  plataforma: 'Plataforma',
+  servicio: 'Servicio',
+  ambiente: 'Ambiente',
+  es_review_app: 'Review app',
+  commit: 'Commit',
+  instancia: 'Instancia',
+  region: 'Región',
+  encendido_segundos: 'Encendido (s)',
+  generado: 'Generado',
+};
 
 const pagina = () => {
   const d = datos();
   const filas = Object.entries(d)
-    .map(([k, v]) => `<tr><th>${k.replace(/_/g, ' ')}</th><td>${v}</td></tr>`)
+    .map(([k, v]) => `<tr><th>${nombres[k] || k}</th><td>${v}</td></tr>`)
     .join('');
   return `<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ambiente efímero | ${d.aplicacion}</title>
+<title>Ambiente efímero | ${d.servicio}</title>
 <style>
   :root { color-scheme: light; }
   * { box-sizing: border-box; }
@@ -52,7 +67,7 @@ const pagina = () => {
   th, td { text-align: left; padding: 11px 14px; font-size: 14px;
            border-bottom: 1px solid #1f2b47; }
   tr:last-child th, tr:last-child td { border-bottom: 0; }
-  th { color: #96a3bd; font-weight: 500; text-transform: capitalize; width: 46%; }
+  th { color: #96a3bd; font-weight: 500; width: 46%; }
   td { font-family: ui-monospace, "SF Mono", Menlo, monospace; }
   footer { margin-top: 18px; font-size: 13px; color: #7b88a3; line-height: 1.5; }
   a { color: #7aa7ff; }
@@ -62,10 +77,10 @@ const pagina = () => {
 <main>
   <span class="tag">Ambiente efímero</span>
   <h1>Servicio de monitoreo de ejemplo</h1>
-  <p class="sub">Node.js desplegado en Heroku. Cada ambiente responde con sus propios datos de ejecución.</p>
+  <p class="sub">Node.js desplegado desde GitHub. Cada ambiente responde con los datos de su propia instancia.</p>
   <table>${filas}</table>
   <footer>
-    Datos leídos de las variables de entorno del dyno. Endpoints:
+    Datos leídos de las variables de entorno del contenedor. Endpoints:
     <a href="/health">/health</a> y <a href="/api/estado">/api/estado</a>.
   </footer>
 </main>
