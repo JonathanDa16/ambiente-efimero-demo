@@ -1,7 +1,7 @@
 {
   "name": "ambiente-efimero-demo",
   "version": "1.0.0",
-  "description": "Aplicación Node.js de demostración para ambientes efímeros desplegada en Heroku",
+  "description": "Aplicación Node.js de demostración para ambientes efímeros desplegada en Render",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
