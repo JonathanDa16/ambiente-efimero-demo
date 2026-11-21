@@ -17,7 +17,7 @@ const datos = () => {
     es_review_app: process.env.IS_PULL_REQUEST === 'true' ? 'si' : 'no',
     commit: commit ? commit.slice(0, 7) : 'sin commit',
     instancia: process.env.RENDER_INSTANCE_ID || process.env.DYNO || 'local',
-    region: process.env.RENDER_REGION || 'local',
+    region: process.env.RENDER_REGION || process.env.REGION || 'local',
     encendido_segundos: Math.round((Date.now() - INICIO) / 1000),
     generado: new Date().toISOString(),
   };
